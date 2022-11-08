@@ -1,1 +1,52 @@
+CREATE DATABASE BankDB
+GO
 
+Create table dbo.Bank(
+ID int NOT NULL Primary key IDENTITY,
+BankName nvarchar(30) NOT NULL
+)
+go
+
+Create table dbo.City(
+ID int NOT NULL Primary key IDENTITY,
+City nvarchar(30) NOT NULL,
+)
+GO
+
+Create table dbo.Branch(
+ID int NOT NULL Primary key IDENTITY,
+BankID int FOREIGN KEY REFERENCES Bank(ID) ON DELETE CASCADE,
+CityID int FOREIGN KEY REFERENCES City(ID) ON DELETE CASCADE,
+BranchName nvarchar(40) NOT NULL
+)
+GO
+
+Create table dbo.Client(
+ID int NOT NULL Primary key IDENTITY,
+BankID int FOREIGN KEY REFERENCES Bank(ID) ON DELETE CASCADE,
+FullName nvarchar(80) NOT NULL,
+DateOfBirth Date NOT NULL Default getdate(),
+[Address] nvarchar(80) NOT NULL
+)
+GO
+
+Create table dbo.Account(
+ID int not null primary key IDENTITY,
+ClientId int unique foreign key references Client(ID) ON DELETE CASCADE,
+AccountNumber int not null,
+SecretWord nvarchar(30) not null
+)
+
+Create table dbo.Cards(
+ID int NOT NULL Primary key IDENTITY,
+AccountID int FOREIGN KEY REFERENCES Account(ID) ON DELETE CASCADE,
+CardNumber int NOT NULL,
+Balance int NOT NULL
+)
+GO
+
+create table dbo.[SocialStatus](
+ID int NOT NULL Primary key IDENTITY,
+ClientId int unique foreign key references Client(ID) ON DELETE CASCADE,
+[SocialStatus] nvarchar(80) NOT NULL
+)
