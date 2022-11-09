@@ -1,4 +1,5 @@
 CREATE DATABASE BankDB
+Use [BankDB]
 GO
 
 Create table dbo.Bank(
