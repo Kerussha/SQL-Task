@@ -22,14 +22,31 @@ BranchName nvarchar(40) NOT NULL
 )
 GO
 
+create table dbo.[SocialStatus](
+ID int NOT NULL Primary key IDENTITY,
+[SocialStatus] nvarchar(80) NOT NULL,
+)
+go
+
+insert into [SocialStatus]
+values
+('Безработный'),
+('Студент'),
+('Работает'),
+('Военнообязанный'),
+('Инвалид')
+
 Create table dbo.Client(
 ID int NOT NULL Primary key IDENTITY,
 BankID int FOREIGN KEY REFERENCES Bank(ID) ON DELETE CASCADE,
 FullName nvarchar(80) NOT NULL,
 DateOfBirth Date NOT NULL Default getdate(),
-[Address] nvarchar(80) NOT NULL
+[Address] nvarchar(80) NOT NULL,
+[SocialStatusID] int unique not null,
+
+CONSTRAINT FK_Client foreign key ([SocialStatusID]) references [SocialStatus](ID)
 )
-GO
+Go
 
 Create table dbo.Account(
 ID int not null primary key IDENTITY,
@@ -38,16 +55,64 @@ AccountNumber int not null,
 SecretWord nvarchar(30) not null
 )
 
-Create table dbo.Cards(
+Create table dbo.[Card](
 ID int NOT NULL Primary key IDENTITY,
 AccountID int FOREIGN KEY REFERENCES Account(ID) ON DELETE CASCADE,
 CardNumber int NOT NULL,
-Balance int NOT NULL
+OwnerName VARCHAR(20) NOT NULL,
+Balance money NULL
 )
 GO
 
-create table dbo.[SocialStatus](
-ID int NOT NULL Primary key IDENTITY,
-ClientId int unique foreign key references Client(ID) ON DELETE CASCADE,
-[SocialStatus] nvarchar(80) NOT NULL
-)
+ Insert into Client(FullName, DateOfBirth, [Address], [SocialStatusID])
+values 
+('Иванов Иван Иванович', '1999-08-12', 'Пушкина 14/5',1),
+('Сергеев Антов Александрович', '2000-02-19', 'Дмитриево 43/16',2),
+('Приходько Анастасия Сергеевна', '1985-11-02', 'Катушкино 65/32',3),
+('Зубкин Николай Алексеевич', '1989-03-07', 'Николаево 86/2',4),
+('Колко Ольга Александровна', '1995-01-20', 'Советская 76/77',5)
+go
+
+
+ALTER TABLE dbo.Account 
+ADD Balance money NULL
+go 
+
+insert into Bank
+values
+('Альфа-Банк'),
+('Сбербанк'),
+('Беларусбанк'),
+('Белинвестбанк'),
+('МТБанк')
+go
+
+insert into City
+values
+('Гомель'),
+('Минск'),
+('Брест'),
+('Витебск'),
+('Пинск')
+go
+
+ALTER TABLE Branch
+DROP COLUMN BranchName;
+Go
+
+Alter table Branch
+add BranchNumber int NULL
+go
+
+insert into Branch(BranchName)
+values
+(4372),
+(1384),
+(2941),
+(6421),
+(7893)
+go
+
+
+
+
