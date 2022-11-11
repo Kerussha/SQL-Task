@@ -6,27 +6,55 @@ Create table dbo.Bank(
 ID int NOT NULL Primary key IDENTITY,
 BankName nvarchar(30) NOT NULL
 )
-go
+
+insert into Bank
+values
+('Альфа-Банк'),
+('Сбербанк'),
+('Беларусбанк'),
+('Белинвестбанк'),
+('МТБанк')
 
 Create table dbo.City(
 ID int NOT NULL Primary key IDENTITY,
 City nvarchar(30) NOT NULL,
 )
-GO
 
-Create table dbo.Branch(
+insert into City
+values
+('Гомель'),
+('Минск'),
+('Брест'),
+('Витебск'),
+('Пинск')
+
+
+
+  Create table dbo.Branch(
 ID int NOT NULL Primary key IDENTITY,
-BankID int FOREIGN KEY REFERENCES Bank(ID) ON DELETE CASCADE,
-CityID int FOREIGN KEY REFERENCES City(ID) ON DELETE CASCADE,
-BranchName nvarchar(40) NOT NULL
+BankID int not null FOREIGN KEY REFERENCES Bank(ID) ON DELETE CASCADE,
+CityID int not null FOREIGN KEY REFERENCES City(ID) ON DELETE CASCADE,
+BranchNumber nvarchar(40) NOT NULL
 )
-GO
+
+insert into Branch(BankID,CityID,BranchNumber)
+values
+(1,4,6124),
+(2,2,2155),
+(3, 1,3211),
+(4, 5,8891),
+(5, 3,3131),
+(1,4, 1123),
+(3,1,9999),
+(3, 1, 5661),
+(5,3,2131),
+(4,5,1122)
 
 create table dbo.[SocialStatus](
 ID int NOT NULL Primary key IDENTITY,
 [SocialStatus] nvarchar(80) NOT NULL,
 )
-go
+
 
 insert into [SocialStatus]
 values
@@ -38,7 +66,7 @@ values
 
 Create table dbo.Client(
 ID int NOT NULL Primary key IDENTITY,
-BankID int FOREIGN KEY REFERENCES Bank(ID) ON DELETE CASCADE,
+BankID int not null FOREIGN KEY REFERENCES Bank(ID) ON DELETE CASCADE,
 FullName nvarchar(80) NOT NULL,
 DateOfBirth Date NOT NULL Default getdate(),
 [Address] nvarchar(80) NOT NULL,
@@ -46,7 +74,13 @@ DateOfBirth Date NOT NULL Default getdate(),
 
 CONSTRAINT FK_Client foreign key ([SocialStatusID]) references [SocialStatus](ID)
 )
-Go
+
+
+
+
+
+
+
 
 Create table dbo.Account(
 ID int not null primary key IDENTITY,
@@ -62,7 +96,7 @@ CardNumber int NOT NULL,
 OwnerName VARCHAR(20) NOT NULL,
 Balance money NULL
 )
-GO
+
 
  Insert into Client(FullName, DateOfBirth, [Address], [SocialStatusID])
 values 
@@ -71,47 +105,17 @@ values
 ('Приходько Анастасия Сергеевна', '1985-11-02', 'Катушкино 65/32',3),
 ('Зубкин Николай Алексеевич', '1989-03-07', 'Николаево 86/2',4),
 ('Колко Ольга Александровна', '1995-01-20', 'Советская 76/77',5)
-go
+
 
 
 ALTER TABLE dbo.Account 
 ADD Balance money NULL
-go 
 
-insert into Bank
-values
-('Альфа-Банк'),
-('Сбербанк'),
-('Беларусбанк'),
-('Белинвестбанк'),
-('МТБанк')
-go
 
-insert into City
-values
-('Гомель'),
-('Минск'),
-('Брест'),
-('Витебск'),
-('Пинск')
-go
 
-ALTER TABLE Branch
-DROP COLUMN BranchName;
-Go
 
-Alter table Branch
-add BranchNumber int NULL
-go
 
-insert into Branch(BranchName)
-values
-(4372),
-(1384),
-(2941),
-(6421),
-(7893)
-go
+
 
 
 
