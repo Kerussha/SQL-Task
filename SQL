@@ -115,8 +115,8 @@ insert into Account(ClientId, AccountNumber, Balance)
 Values
 (1, 11111, 65000),
 (2,22222,70000),
-(3, 33333, 40000),
-(4,44444,25000),
+(3, 33333, 45000),
+(4,44444,default),
 (5, 55555, 17000),
 (6,66666,Default),
 (7, 77777, Default),
@@ -129,11 +129,29 @@ Create table dbo.[Card](
 ID int NOT NULL Primary key IDENTITY,
 AccountID int FOREIGN KEY REFERENCES Account(ID) ON DELETE CASCADE,
 CardNumber int NOT NULL,
-OwnerName VARCHAR(20) NOT NULL,
+OwnerName VARCHAR(30),
 Balance money 
 )
 go
 
+  insert into [Card](AccountID,CardNumber,OwnerName,Balance)
+  values
+  (1, 11111111, 'Иванов Иван',40000),
+  (1, 12222222, 'Иванов Иван',25000),
+  (2, 22222222, 'Антов Александрович',70000),
+  (3, 33333333, 'Приходько Анастасия',15000),
+  (3, 31111111, 'Приходько Анастасия',15000),
+  (3, 32222222, 'Приходько Анастасия',10000),
+  (5, 55555555, 'Колко Ольга',20000),
+  (5,51111111, default,5000),
+  (6, 66666666, 'Залан Ержан',default),
+  (7, 77777777, 'Артемов Аретм',default),
+  (7, 71111111, 'Артемов Аретм',default),
+  (8, 88888888, 'Клыжына Анна',30000),
+  (8, 81111111, 'Клыжына Анна',3000),
+  (9, 99999999, 'Круглая Анастасия',45000),
+  (9, 99999999, default,40000)
+  go
 
  
 
