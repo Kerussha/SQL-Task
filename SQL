@@ -6,6 +6,7 @@ Create table dbo.Bank(
 ID int NOT NULL Primary key IDENTITY,
 BankName nvarchar(30) NOT NULL
 )
+go
 
 insert into Bank
 values
@@ -14,11 +15,13 @@ values
 ('Беларусбанк'),
 ('Белинвестбанк'),
 ('МТБанк')
+go
 
 Create table dbo.City(
 ID int NOT NULL Primary key IDENTITY,
 City nvarchar(30) NOT NULL,
 )
+go
 
 insert into City
 values
@@ -27,15 +30,16 @@ values
 ('Брест'),
 ('Витебск'),
 ('Пинск')
+go
 
 
-
-  Create table dbo.Branch(
+ Create table dbo.Branch(
 ID int NOT NULL Primary key IDENTITY,
-BankID int not null FOREIGN KEY REFERENCES Bank(ID) ON DELETE CASCADE,
-CityID int not null FOREIGN KEY REFERENCES City(ID) ON DELETE CASCADE,
+BankID int  FOREIGN KEY REFERENCES Bank(ID) ON DELETE CASCADE,
+CityID int  FOREIGN KEY REFERENCES City(ID) ON DELETE CASCADE,
 BranchNumber nvarchar(40) NOT NULL
 )
+go
 
 insert into Branch(BankID,CityID,BranchNumber)
 values
@@ -54,7 +58,7 @@ create table dbo.[SocialStatus](
 ID int NOT NULL Primary key IDENTITY,
 [SocialStatus] nvarchar(80) NOT NULL,
 )
-
+go
 
 insert into [SocialStatus]
 values
@@ -62,11 +66,17 @@ values
 ('Студент'),
 ('Работает'),
 ('Военнообязанный'),
-('Инвалид')
+('Инвалид'),
+('Холост'),
+('Профессор наук'),
+('В разводе'),
+('Не замужем'),
+('Замужем')
+go
 
 Create table dbo.Client(
 ID int NOT NULL Primary key IDENTITY,
-BankID int not null FOREIGN KEY REFERENCES Bank(ID) ON DELETE CASCADE,
+BankID int FOREIGN KEY REFERENCES Bank(ID) ON DELETE CASCADE,
 FullName nvarchar(80) NOT NULL,
 DateOfBirth Date NOT NULL Default getdate(),
 [Address] nvarchar(80) NOT NULL,
@@ -74,42 +84,60 @@ DateOfBirth Date NOT NULL Default getdate(),
 
 CONSTRAINT FK_Client foreign key ([SocialStatusID]) references [SocialStatus](ID)
 )
+go
 
-
-
-
-
-
+Insert into Client(BankID, FullName, DateOfBirth, [Address], SocialStatusID)
+	values 
+	(1,'Иванов Иван Иванович', '1999-08-12', 'Пушкина 14/5',2),
+	(2,'Сергеев Антов Александрович', '2000-02-19', 'Дмитриево 43/16',1),
+	(3,'Приходько Анастасия Сергеевна', '1985-11-02', 'Катушкино 65/32',3),
+	(4,'Зубкин Николай Алексеевич', '1989-03-07', 'Николаево 86/2',4),
+	(5,'Колко Ольга Александровна', '1995-01-20', 'Советская 76/77',5),
+	(1,'Залан Ержан Артемович', '1987-02-11', 'Круг 65/194',7),
+	(4,'Артемов Аретм Александрович', '2003-05-23', 'Демидова 77/18',6),
+	(3,'Клыжына Анна Сергеевна', '1981-10-20', 'Катушкино 90/98',8),
+	(3,'Круглая Анастассия Алексеевна', '1998-07-07', 'Фрау 11/15',9),
+	(5,'Копыто Инга Сергеевна', '2002-02-17', 'Советская 100/77',10)
+ go
 
 
 Create table dbo.Account(
 ID int not null primary key IDENTITY,
-ClientId int unique foreign key references Client(ID) ON DELETE CASCADE,
+ClientId int unique  not null,
 AccountNumber int not null,
-SecretWord nvarchar(30) not null
+Balance money,
+
+Constraint FK_Account foreign key(ClientID) references Client(ID)
 )
+go
+
+insert into Account(ClientId, AccountNumber, Balance)
+Values
+(1, 11111, 65000),
+(2,22222,70000),
+(3, 33333, 40000),
+(4,44444,25000),
+(5, 55555, 17000),
+(6,66666,Default),
+(7, 77777, Default),
+(8,88888,33000),
+(9, 99999, 85000),
+(10,10000,Default)
+go
 
 Create table dbo.[Card](
 ID int NOT NULL Primary key IDENTITY,
 AccountID int FOREIGN KEY REFERENCES Account(ID) ON DELETE CASCADE,
 CardNumber int NOT NULL,
 OwnerName VARCHAR(20) NOT NULL,
-Balance money NULL
+Balance money 
 )
+go
 
 
- Insert into Client(FullName, DateOfBirth, [Address], [SocialStatusID])
-values 
-('Иванов Иван Иванович', '1999-08-12', 'Пушкина 14/5',1),
-('Сергеев Антов Александрович', '2000-02-19', 'Дмитриево 43/16',2),
-('Приходько Анастасия Сергеевна', '1985-11-02', 'Катушкино 65/32',3),
-('Зубкин Николай Алексеевич', '1989-03-07', 'Николаево 86/2',4),
-('Колко Ольга Александровна', '1995-01-20', 'Советская 76/77',5)
+ 
 
 
-
-ALTER TABLE dbo.Account 
-ADD Balance money NULL
 
 
 
