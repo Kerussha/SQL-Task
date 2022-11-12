@@ -134,25 +134,63 @@ Balance money
 )
 go
 
-  insert into [Card](AccountID,CardNumber,OwnerName,Balance)
-  values
-  (1, 11111111, 'Иванов Иван',40000),
-  (1, 12222222, 'Иванов Иван',25000),
-  (2, 22222222, 'Антов Александрович',70000),
-  (3, 33333333, 'Приходько Анастасия',15000),
-  (3, 31111111, 'Приходько Анастасия',15000),
-  (3, 32222222, 'Приходько Анастасия',10000),
-  (5, 55555555, 'Колко Ольга',20000),
-  (5,51111111, default,5000),
-  (6, 66666666, 'Залан Ержан',default),
-  (7, 77777777, 'Артемов Аретм',default),
-  (7, 71111111, 'Артемов Аретм',default),
-  (8, 88888888, 'Клыжына Анна',30000),
-  (8, 81111111, 'Клыжына Анна',3000),
-  (9, 99999999, 'Круглая Анастасия',45000),
-  (9, 99999999, default,40000)
-  go
+insert into [Card](AccountID,CardNumber,OwnerName,Balance)
+values
+(1, 11111111, 'Иванов Иван',40000),
+(1, 12222222, 'Иванов Иван',25000),
+(2, 22222222, 'Антов Александрович',40000),
+(3, 33333333, 'Приходько Анастасия',15000),
+(3, 31111111, 'Приходько Анастасия',15000),
+(3, 32222222, 'Приходько Анастасия',10000),
+(5, 55555555, 'Колко Ольга',9000),
+(5, 51111111, default,5000),
+(6, 66666666, 'Залан Ержан',default),
+(7, 77777777, 'Артемов Аретм',default),
+(7, 71111111, 'Артемов Аретм',default),
+(8, 88888888, 'Клыжына Анна',25000),
+(8, 81111111, 'Клыжына Анна',3000),
+(9, 99999999, 'Круглая Анастасия',10000),
+(9, 91111111, default,35000)
+go
 
+ /*1. Покажи мне список банков у которых есть филиалы в городе Гомель  */
+  Select BankName, BranchNumber
+  From Branch as Br
+	join City on City.Id = Br.CityID
+        join Bank on Bank.Id = Br.BankID
+  Where City in ('Брест')
+  go
+  /* 2. Получить список карточек с указанием имени владельца, баланса и названия банка*/
+
+  Select OwnerName, [Card].Balance, BankName
+  From Bank
+	  join Client on Bank.Id = Client.BankID
+	  join Account on Client.Id = Account.ClientId
+	  join [card] on Account.Id = [Card].AccountId
+  go
+  
+   /*  3. Показать список банковских аккаунтов у которых баланс не совпадает с суммой баланса по карточкам. В отдельной колонке вывести разницу*/
+  	-- 1 вариант
+;with ps as (
+	select c.AccountID,SUM(c.Balance) as cardBalance
+	from [Card] c
+	group by c.AccountID
+)
+select a.ID,a.Balance - ps.cardBalance as razn 
+from Account a
+	join ps on ps.AccountID = a.ID
+where a.Balance <> ps.cardBalance
+
+--2 вариант	
+select  a.ID,a.Balance - ps.cardBalance as razn
+from Account a
+	cross apply (
+		select c.AccountID,SUM(c.Balance) as cardBalance
+		from [Card] c
+		where c.AccountID = a.ID
+		group by c.AccountID
+	) ps
+where a.Balance <> ps.cardBalance
  
 
 
