@@ -191,6 +191,18 @@ from Account a
 		group by c.AccountID
 	) ps
 where a.Balance <> ps.cardBalance
+
+-- 4. Вывести кол-во банковских карточек для каждого соц статуса (2 реализации, GROUP BY и подзапросом)
+
+--1) Group by
+	Select Count(*) coun, SocialStatus
+	from SocialStatus s
+		join Client c on s.Id = c.SocialStatusID
+		join Account a on c.Id = a.ClientId
+		join [card] crd on a.ID = crd.AccountId
+	Group by SocialStatus
+
+-- 2) Подзапросом
  
 
 
