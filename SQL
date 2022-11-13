@@ -217,17 +217,15 @@ go
 
 --1) Group by
 
-SELECT Count(*) coun,
-		SocialStatus
-FROM SocialStatus stat
-JOIN Client 
-	ON stat.Id = Client.SocialStatusID
-JOIN Account acc
-	ON client.Id = acc.ClientId
- left JOIN [card] crd
-	ON acc.ID = crd.AccountId
-GROUP BY  SocialStatus
-go
+Select 
+	 count(crd.ID) [count],
+	 s.SocialStatus
+from SocialStatus s
+	join Client c on c.SocialStatusID = s.ID
+	join Account a on a.ClientId = c.ID
+	left join [card] crd on crd.AccountId = a.ID
+group by 
+	s.SocialStatus
 
 -- 2) Подзапросом
 SELECT 
