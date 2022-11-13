@@ -52,7 +52,11 @@ values
 (3,1,9999),
 (3, 1, 5661),
 (5,3,2131),
-(4,5,1122)
+(4,5,1122),
+(3,4,9999),
+(3, 5, 5661),
+(4,3,2131),
+(4,1,1122)
 
 create table dbo.[SocialStatus](
 ID int NOT NULL Primary key IDENTITY,
@@ -71,7 +75,8 @@ values
 ('Профессор наук'),
 ('В разводе'),
 ('Не замужем'),
-('Замужем')
+('Замужем'),
+('Пенсионер')
 go
 
 Create table dbo.Client(
@@ -97,7 +102,8 @@ Insert into Client(BankID, FullName, DateOfBirth, [Address], SocialStatusID)
 	(4,'Артемов Аретм Александрович', '2003-05-23', 'Демидова 77/18',6),
 	(3,'Клыжына Анна Сергеевна', '1981-10-20', 'Катушкино 90/98',8),
 	(3,'Круглая Анастассия Алексеевна', '1998-07-07', 'Фрау 11/15',9),
-	(5,'Копыто Инга Сергеевна', '2002-02-17', 'Советская 100/77',10)
+	(5,'Копыто Инга Сергеевна', '2002-02-17', 'Советская 100/77',10),
+	(2,'Закревская Полина Ивановна', '1965-05-19', 'Беговая 90/11',11)
  go
 
 
@@ -153,56 +159,88 @@ values
 (9, 91111111, default,35000)
 go
 
- /*1. Покажи мне список банков у которых есть филиалы в городе Гомель  */
-  Select BankName, BranchNumber
-  From Branch as Br
-	join City on City.Id = Br.CityID
-        join Bank on Bank.Id = Br.BankID
-  Where City in ('Брест')
-  go
+ /*1. Покажи мне список банков у которых есть филиалы в городе Витебск */
+ 
+ SELECT BankName,
+	BranchNumber
+FROM Branch AS Br
+JOIN City
+	ON City.Id = Br.CityID
+JOIN Bank
+	ON Bank.Id = Br.BankID
+WHERE City IN ('Витебск') 
+go
+  
   /* 2. Получить список карточек с указанием имени владельца, баланса и названия банка*/
 
-  Select OwnerName, [Card].Balance, BankName
-  From Bank
-	  join Client on Bank.Id = Client.BankID
-	  join Account on Client.Id = Account.ClientId
-	  join [card] on Account.Id = [Card].AccountId
-  go
+ SELECT OwnerName,
+ 	[Card].Balance,
+ 	BankName
+FROM Bank
+JOIN Client
+	ON Bank.Id = Client.BankID
+JOIN Account
+	ON Client.Id = Account.ClientId
+JOIN [card]
+	ON Account.Id = [Card].AccountId
+go
   
    /*  3. Показать список банковских аккаунтов у которых баланс не совпадает с суммой баланса по карточкам. В отдельной колонке вывести разницу*/
   	-- 1 вариант
-;with ps as (
-	select c.AccountID,SUM(c.Balance) as cardBalance
-	from [Card] c
-	group by c.AccountID
-)
-select a.ID,a.Balance - ps.cardBalance as razn 
-from Account a
-	join ps on ps.AccountID = a.ID
-where a.Balance <> ps.cardBalance
+	
+;with ps AS 
+	(SELECT crd.AccountID,
+			SUM(crd.Balance) AS cardBalance
+	FROM [Card] crd
+	GROUP BY  crd.AccountID )
+SELECT acc.ID,
+	   acc.Balance - ps.cardBalance AS razn
+FROM Account acc
+JOIN ps
+	ON ps.AccountID = acc.ID
+WHERE acc.Balance <> ps.cardBalance
+go
 
 --2 вариант	
-select  a.ID,a.Balance - ps.cardBalance as razn
-from Account a
-	cross apply (
-		select c.AccountID,SUM(c.Balance) as cardBalance
-		from [Card] c
-		where c.AccountID = a.ID
-		group by c.AccountID
-	) ps
-where a.Balance <> ps.cardBalance
+SELECT acc.ID,
+	   acc.Balance - ps.cardBalance AS razn
+FROM Account acc cross apply 
+	(SELECT crd.AccountID,
+			SUM(crd.Balance) AS cardBalance
+	FROM [Card] crd
+	WHERE crd.AccountID = acc.ID
+	GROUP BY  crd.AccountID ) ps
+WHERE acc.Balance <> ps.cardBalance
+go
 
 -- 4. Вывести кол-во банковских карточек для каждого соц статуса (2 реализации, GROUP BY и подзапросом)
 
 --1) Group by
-	Select Count(*) coun, SocialStatus
-	from SocialStatus s
-		join Client c on s.Id = c.SocialStatusID
-		join Account a on c.Id = a.ClientId
-		join [card] crd on a.ID = crd.AccountId
-	Group by SocialStatus
+
+SELECT Count(*) coun,
+		SocialStatus
+FROM SocialStatus stat
+JOIN Client 
+	ON stat.Id = Client.SocialStatusID
+JOIN Account acc
+	ON client.Id = acc.ClientId
+ left JOIN [card] crd
+	ON acc.ID = crd.AccountId
+GROUP BY  SocialStatus
+go
 
 -- 2) Подзапросом
+SELECT 
+	(SELECT count(*)
+	FROM [card]
+	WHERE acc.Id = [card].AccountID) coun, stat.SocialStatus
+FROM SocialStatus stat
+Where 
+JOIN Client 
+	ON stat.Id = client.SocialStatusID
+JOIN Account acc
+	ON client.Id = acc.ClientId
+go
  
 
 
